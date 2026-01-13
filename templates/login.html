@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Login - UPI Guard{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-header">
+            <h1>🛡️ UPI Guard</h1>
+            <p>Real-Time Fraud Detection System</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input 
+                    type="text" 
+                    id="mobile" 
+                    name="mobile" 
+                    placeholder="Enter 10-digit mobile number"
+                    maxlength="10"
+                    pattern="[0-9]{10}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="user_type">Login As</label>
+                <select id="user_type" name="user_type" required>
+                    <option value="user">User (Payer)</option>
+                    <option value="merchant">Merchant (Seller)</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Send OTP</button>
+        </form>
+
+        <div class="login-info">
+            <h3>How it works:</h3>
+            <ul>
+                <li>Enter your mobile number</li>
+                <li>Select your role (User/Merchant/Admin)</li>
+                <li>OTP will be sent to your email</li>
+                <li>Verify OTP to login</li>
+            </ul>
+            <p class="dev-note">🔧 Development Mode: OTP is displayed in console</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

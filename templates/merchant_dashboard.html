@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Merchant Dashboard - UPI Guard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>🛡️ UPI Guard</h1>
+            <div class="user-info">
+                <span>🏪 {{ merchant['business_name'] }}</span>
+                <span>📱 {{ merchant['mobile'] }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-content">
+        <div class="dashboard-sidebar">
+            <div class="user-profile-card">
+                <h3>Business Profile</h3>
+                <div class="profile-info">
+                    <p><strong>Business Name:</strong> {{ merchant['business_name'] }}</p>
+                    <p><strong>Mobile:</strong> {{ merchant['mobile'] }}</p>
+                    <p><strong>UPI ID:</strong> {{ merchant['upi_id'] }}</p>
+                    <p><strong>Account Age:</strong> {{ merchant['merchant_age'] }} days</p>
+                </div>
+            </div>
+
+            <div class="quick-stats">
+                <h3>Quick Stats</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Total Payments:</span>
+                    <span class="stat-value">{{ transactions|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Account Age:</span>
+                    <span class="stat-value">{{ merchant['merchant_age'] }} days</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-main">
+            <div class="dashboard-card">
+                <h2>Generate QR Code</h2>
+                <p>Generate a QR code for customers to scan and make payments</p>
+                <button id="generate-qr-btn" class="btn btn-primary">Generate QR Code</button>
+                <div id="qr-result" class="qr-result"></div>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Received Payments</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if transactions %}
+                                {% for txn in transactions %}
+                                <tr>
+                                    <td>{{ txn['transaction_id'] }}</td>
+                                    <td>{{ txn['user_name'] }}</td>
+                                    <td>₹{{ "%.2f"|format(txn['amount']) }}</td>
+                                    <td>
+                                        {% if txn['status'] == 'completed' %}
+                                            <span class="badge badge-success">Completed</span>
+                                        {% elif txn['status'] == 'blocked' %}
+                                            <span class="badge badge-danger">Blocked</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ txn['created_at'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No payments received yet</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('generate-qr-btn').addEventListener('click', async function() {
+    const resultDiv = document.getElementById('qr-result');
+    resultDiv.innerHTML = '<div class="loading">Generating QR code...</div>';
+    
+    try {
+        const response = await fetch('/api/generate_qr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="qr-display">
+                    <div class="qr-info">
+                        <h3>Your UPI ID for Payments:</h3>
+                        <div class="upi-id-display">${data.upi_id}</div>
+                        <p class="qr-instructions">
+                            Share this UPI ID with customers or generate a QR code.
+                            Customers can scan or enter this UPI ID to make payments.
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ ${data.message}
+                </div>
+            `;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Error: ${error.message}
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}

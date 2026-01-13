@@ -1,0 +1,88 @@
+UPI TRANSACTION DATASET - COLUMN EXPLANATIONS
+==============================================
+
+This document explains each column in the UPI transaction dataset (upi_transactions.csv).
+
+1. transaction_id (Integer)
+   - Unique identifier for each transaction
+   - Format: Sequential number (1, 2, 3, ...)
+
+2. amount (Float)
+   - Transaction amount in Indian Rupees (₹)
+   - Range: ₹1.00 to ₹1,00,000
+   - Example: 500.00, 1250.50, 9999.99
+
+3. time_hour (Integer)
+   - Hour of day when transaction occurred
+   - Range: 0 to 23 (24-hour format)
+   - Example: 0 = Midnight, 12 = Noon, 23 = 11 PM
+
+4. time_minute (Integer)
+   - Minute of hour when transaction occurred
+   - Range: 0 to 59
+   - Example: 0, 15, 30, 45
+
+5. user_age (Integer)
+   - Age of the payer/user making the transaction
+   - Range: 18 to 80 years
+   - Example: 25, 35, 42
+
+6. merchant_age (Integer)
+   - Age of the merchant account (in days since account creation)
+   - Range: 1 to 3650 days (approximately 10 years)
+   - Example: 30, 180, 365 (represents account trustworthiness)
+
+7. state_code (Integer)
+   - Encoded state location where transaction originated
+   - Range: 1 to 36 (representing different Indian states)
+   - Example: 1 = Delhi, 2 = Maharashtra, 3 = Karnataka, etc.
+   - Used to detect unusual location patterns
+
+8. zip_code (Integer)
+   - First 3 digits of zip code (for privacy)
+   - Range: 100 to 999
+   - Example: 110, 400, 560
+   - Helps in location-based fraud detection
+
+9. category (Integer)
+   - Type of transaction
+   - Range: 1 to 10
+   - Mapping:
+     1 = Grocery
+     2 = Food & Dining
+     3 = Shopping
+     4 = Travel
+     5 = Bills & Utilities
+     6 = Entertainment
+     7 = Healthcare
+     8 = Education
+     9 = Transfer
+     10 = Other
+
+10. upi_id_hash (Integer)
+    - Hashed representation of UPI ID (for privacy)
+    - Range: 1000 to 99999
+    - Example: 12345, 67890
+    - Helps detect patterns in UPI ID usage
+
+11. fraud (Integer)
+    - Target variable / Label
+    - 0 = Legitimate transaction
+    - 1 = Fraudulent transaction
+    - This is what the model predicts
+
+DATASET STATISTICS:
+===================
+- Total Transactions: 50,000
+- Legitimate (fraud=0): 45,000 (90%)
+- Fraudulent (fraud=1): 5,000 (10%)
+- This represents realistic fraud ratio in UPI transactions
+
+FEATURE ENGINEERING NOTES:
+==========================
+- Time features (hour, minute) help detect unusual transaction times
+- Location features (state, zip) help detect geolocation anomalies
+- Age features help detect account age patterns
+- Amount helps detect unusual transaction sizes
+- Category helps detect spending pattern anomalies
+- Combined features create a comprehensive fraud detection profile
