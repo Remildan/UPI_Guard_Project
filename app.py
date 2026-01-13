@@ -39,19 +39,18 @@ def load_models():
         # Load CNN model
         if os.path.exists(MODEL_PATH):
             fraud_model = keras.models.load_model(MODEL_PATH)
-            print(f"✓ CNN model loaded from {MODEL_PATH}")
+            app.logger.info(f"CNN model loaded from {MODEL_PATH}")
         else:
-            print(f"⚠ Warning: Model not found at {MODEL_PATH}")
-            print("  Please train models first: python models/train_models.py")
+            app.logger.info(f"Model not found at {MODEL_PATH} - running in fallback mode")
         
         # Load scaler
         if os.path.exists(SCALER_PATH):
             scaler = joblib.load(SCALER_PATH)
-            print(f"✓ Scaler loaded from {SCALER_PATH}")
+            app.logger.info(f"Scaler loaded from {SCALER_PATH}")
         else:
-            print(f"⚠ Warning: Scaler not found at {SCALER_PATH}")
+            app.logger.info(f"Scaler not found at {SCALER_PATH} - running in fallback mode")
     except Exception as e:
-        print(f"Error loading models: {e}")
+        app.logger.warning(f"Error loading models: {e}")
 
 # Load models at startup
 print("\nInitializing UPI Guard...")
@@ -141,9 +140,15 @@ def login_required(f):
 # ==================== Routes ====================
 
 @app.route('/')
-def index():
-    """Home page - redirect to login"""
-    return redirect(url_for('login'))
+def home():
+    """Home page"""
+    return render_template('index.html')
+
+
+@app.route('/test')
+def test():
+    """Health check route"""
+    return "App is running", 200
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -579,7 +584,7 @@ if __name__ == '__main__':
     print("\n" + "=" * 60)
     print("UPI Guard - Real-Time Fraud Detection System")
     print("=" * 60)
-    print(f"\nServer starting on http://127.0.0.1:{PORT}")
+    print(f"\nServer starting on http://127.0.0.1:10000")
     print("\nAvailable routes:")
     print("  - /login (User/Merchant/Admin login)")
     print("  - /user/dashboard (User dashboard)")
@@ -587,5 +592,5 @@ if __name__ == '__main__':
     print("  - /admin/dashboard (Admin dashboard)")
     print("\nPress Ctrl+C to stop the server")
     print("=" * 60 + "\n")
-    
-    app.run(debug=DEBUG, port=PORT, host='0.0.0.0')
+    # Force debug=True temporarily to show full tracebacks for troubleshooting
+    app.run(debug=True, port=10000, host='0.0.0.0')

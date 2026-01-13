@@ -1,11 +1,13 @@
 """
 Configuration file for UPI Guard Application
 """
+import os
 
 # Flask Configuration
-SECRET_KEY = 'your-secret-key-change-in-production-2024'
-DEBUG = True
-PORT = 5000
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production-2024')
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('1', 'true', 'yes')
+# Use environment PORT if provided (Render sets PORT)
+PORT = int(os.environ.get('PORT', '10000'))
 
 # Database Configuration
 DATABASE_PATH = 'upi_guard.db'
